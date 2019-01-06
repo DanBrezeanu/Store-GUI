@@ -20,6 +20,10 @@ public abstract class ItemList {
         this.end = null;
     }
 
+    public void setComparator(Comparator comparator){
+        this.comparator = comparator;
+    }
+
     static class Node<T> {
         private T value;
         private Node<T> next;
@@ -328,6 +332,18 @@ public abstract class ItemList {
         resultString += "]";
 
         return resultString;
+    }
+
+    public void sortList(){
+        Vector<Item> v = this.toVector();
+
+        Collections.sort(v, this.comparator);
+
+        for(int i = 0; i < v.size(); ++i)
+            remove(0);
+
+        for(Item i : v)
+            add(i);
     }
 
     public Double getTotalPrice(){

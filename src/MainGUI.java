@@ -7,6 +7,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Scanner;
 
 public class MainGUI implements ActionListener {
@@ -27,6 +29,9 @@ public class MainGUI implements ActionListener {
     private JButton addProductButton, sortProductsButton, modifyProductButton, deleteProductButton;
 
     private JFrame popUpFrame;
+
+    private String[] prodColNames = { "Name", "ID", "Price", "Department"};
+    private Object[][] prodData;
 
 
     MainGUI(){
@@ -131,7 +136,7 @@ public class MainGUI implements ActionListener {
         storePanel.setLayout(new FlowLayout());
 
         String[] departColNames = {"ID", "Name", "# Products"};
-        Object[][] departData = new Object[store.getDepartments().size() + 50][3];
+        Object[][] departData = new Object[store.getDepartments().size()][3];
         int currentDepart = 0;
 
         for(Department d : store.getDepartments()){
@@ -151,10 +156,8 @@ public class MainGUI implements ActionListener {
         storeDepartPanel.add(departScrollPane);
         storePanel.add(storeDepartPanel);
 
-
-        String[] prodColNames = { "Name", "ID", "Price", "Department"};
-        Object[][] prodData = new Object[totalProducts + 1][4];
         int currentProd = 0;
+        prodData = new Object[totalProducts][4];
 
         for(Department d : store.getDepartments()){
             for(Item i : d.getItems()){
@@ -249,7 +252,7 @@ public class MainGUI implements ActionListener {
 
     public void createPopUpSortProducts(){
         JPanel mainPopUpPanel = new JPanel(new GridLayout(0,1));
-        String[] comboData = {"Smallest to Largest (Price)", "Largest to Smallest (Price)", "A to Z", "Z to A"};
+        String[] comboData = {"Smallest to Highest (Price)", "Highest to Smallest (Price)", "A to Z", "Z to A"};
         JComboBox<String> comboBox = new JComboBox<>(comboData);
 
         mainPopUpPanel.add(comboBox);
@@ -260,17 +263,83 @@ public class MainGUI implements ActionListener {
         if(result == JOptionPane.OK_OPTION){
             switch(comboBox.getSelectedIndex()){
                 case 0: // <
+                    for(int i = 0; i < prodData.length - 1; ++i)
+                        for(int j = i + 1; j < prodData.length; ++j){
+                            Double o1 = (Double)prodData[i][2];
+                            Double o2 = (Double)prodData[j][2];
+
+                            if(o1.compareTo(o2) > 0){
+                                Object[] aux = new Object[4];
+
+                                for(int k = 0; k < 4; ++k)
+                                    aux[k] = prodData[i][k];
+
+                                prodData[i] = prodData[j];
+                                prodData[j] = aux;
+                            }
+                        }
                     break;
 
                 case 1: // >
+                    for(int i = 0; i < prodData.length - 1; ++i)
+                        for(int j = i + 1; j < prodData.length; ++j){
+                            Double o1 = (Double)prodData[i][2];
+                            Double o2 = (Double)prodData[j][2];
+
+                            if(o1.compareTo(o2) < 0){
+                                Object[] aux = new Object[4];
+
+                                for(int k = 0; k < 4; ++k)
+                                    aux[k] = prodData[i][k];
+
+                                prodData[i] = prodData[j];
+                                prodData[j] = aux;
+                            }
+                        }
                     break;
 
                 case 2: // A-Z
+                    for(int i = 0; i < prodData.length - 1; ++i)
+                        for(int j = i + 1; j < prodData.length; ++j){
+                            String o1 = (String)prodData[i][0];
+                            String o2 = (String)prodData[j][0];
+
+                            if(o1.compareTo(o2) > 0){
+                                Object[] aux = new Object[4];
+
+                                for(int k = 0; k < 4; ++k)
+                                    aux[k] = prodData[i][k];
+
+                                prodData[i] = prodData[j];
+                                prodData[j] = aux;
+                            }
+                        }
                     break;
 
                 case 3: //Z-A
+                    for(int i = 0; i < prodData.length - 1; ++i)
+                        for(int j = i + 1; j < prodData.length; ++j){
+                            String o1 = (String)prodData[i][0];
+                            String o2 = (String)prodData[j][0];
+
+                            if(o1.compareTo(o2) < 0){
+                                Object[] aux = new Object[4];
+
+                                for(int k = 0; k < 4; ++k)
+                                    aux[k] = prodData[i][k];
+
+                                prodData[i] = prodData[j];
+                                prodData[j] = aux;
+                            }
+                        }
                     break;
             }
+
+            storeProductsPanel.remove(prodScrollPane);
+            prodScrollPane = new JScrollPane(new JTable(prodData, prodColNames));
+            storeProductsPanel.add(prodScrollPane);
+            storeProductsPanel.revalidate();
+
         }
 
 
@@ -310,6 +379,7 @@ public class MainGUI implements ActionListener {
 
         if(e.getSource() == sortProductsButton){
             createPopUpSortProducts();
+
         }
     }
 
