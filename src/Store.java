@@ -25,6 +25,10 @@ public class Store {
         return storeInstance;
     }
 
+    public String getName(){
+        return name;
+    }
+
     public void enter(Customer c){
         customers.add(c);
     }

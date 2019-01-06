@@ -6,7 +6,7 @@ import java.util.*;
 public class Test {
     private Store store;
 
-    private void parseStoreTxt(File storeTxt) {
+    public void parseStoreTxt(File storeTxt) {
         try {
             Scanner storeSc = new Scanner(storeTxt);
 
@@ -68,7 +68,7 @@ public class Test {
         }
     }
 
-    private void parseCustomersTxt(File customersTxt){
+    public void parseCustomersTxt(File customersTxt){
         try{
             Scanner customerSc = new Scanner(customersTxt);
 
@@ -85,7 +85,7 @@ public class Test {
         }
     }
 
-    private void parseEventsTxt(){
+    public void parseEventsTxt(){
         try{
             Scanner eventsSc = new Scanner(new File("events.txt"));
 

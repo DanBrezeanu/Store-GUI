@@ -1,3 +1,4 @@
+import com.sun.javafx.beans.IDProperty;
 import sun.applet.Main;
 
 import javax.swing.*;
@@ -5,23 +6,38 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.IOException;
+import java.util.Scanner;
 
 public class MainGUI implements ActionListener {
     private JFrame mainFrame;
+    private JPanel importPanel;
     private JFileChooser fileChooser;
     private JLabel storeTxt, customersTxt;
     private JButton browseStoreTxt, browseCustomersTxt, importFilesButton;
     private JTextField pathStoreTxt, pathCustomersTxt;
 
+    private JTabbedPane tabbedPane;
+    private JPanel storePanel, customerPanel;
+
+    private JTable departTable, productTable;
+    private JScrollPane departScrollPane, prodScrollPane;
+
+    private JPanel storeDepartPanel, storeProductsPanel, storeButtonsPanel;
+    private JButton addProductButton, sortProductsButton, modifyProductButton, deleteProductButton;
+
+    private JFrame popUpFrame;
+
 
     MainGUI(){
         mainFrame = new JFrame("Store");
+        importPanel = new JPanel();
 
         mainFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
         //mainFrame.setPreferredSize(new Dimension(900,500));
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         //mainFrame.setLocationRelativeTo(null);
-        mainFrame.setLayout(new GridBagLayout());
+        importPanel.setLayout(new GridBagLayout());
         //mainFrame.pack();
         GridBagConstraints c = new GridBagConstraints();
 
@@ -33,22 +49,22 @@ public class MainGUI implements ActionListener {
         customersTxt = new JLabel("   customers.txt  ");
         browseStoreTxt = new JButton("Browse..");
         browseCustomersTxt = new JButton("Browse..");
-        pathStoreTxt = new JTextField(50);
-        pathCustomersTxt = new JTextField(50);
+        pathStoreTxt = new JTextField("C:\\Users\\Dan\\Desktop\\test00\\store.txt"); //TODO: 50
+        pathCustomersTxt = new JTextField("C:\\Users\\Dan\\Desktop\\test00\\customers.txt"); //TODO: 50
 
-        mainFrame.add(browseStoreTxt, c);
+        importPanel.add(browseStoreTxt, c);
         c.gridx++;
-        mainFrame.add(storeTxt, c);
+        importPanel.add(storeTxt, c);
         c.gridx++;
-        mainFrame.add(pathStoreTxt, c);
+        importPanel.add(pathStoreTxt, c);
 
         c.gridy+= 2; c.gridx = 0;
 
-        mainFrame.add(browseCustomersTxt, c);
+        importPanel.add(browseCustomersTxt, c);
         c.gridx++;
-        mainFrame.add(customersTxt, c);
+        importPanel.add(customersTxt, c);
         c.gridx++;
-        mainFrame.add(pathCustomersTxt, c);
+        importPanel.add(pathCustomersTxt, c);
 
 
         browseCustomersTxt.addActionListener(this);
@@ -60,13 +76,203 @@ public class MainGUI implements ActionListener {
         importFilesButton = new JButton("Import files");
         importFilesButton.addActionListener(this);
 
-        mainFrame.add(importFilesButton, c);
+        importPanel.add(importFilesButton, c);
 
-
+        importPanel.setVisible(true);
+        mainFrame.add(importPanel);
         mainFrame.setVisible(true);
     }
 
     void startStore(File storeFile, File customersFile){
+        Test testObj = new Test();
+        Store store;
+
+        testObj.parseStoreTxt(storeFile);
+        testObj.parseCustomersTxt(customersFile);
+
+        store = Store.getInstance("dummy_text");
+
+        mainFrame.remove(importPanel);
+
+        createMainGUI();
+    }
+
+    public void createMainGUI(){
+        Store storeInstance = Store.getInstance("dummy_text");
+
+
+        mainFrame.setTitle(storeInstance.getName());
+
+        tabbedPane = new JTabbedPane();
+
+        storePanel = new JPanel();
+        createStorePanel();
+        tabbedPane.addTab("Store", storePanel);
+
+
+        customerPanel = new JPanel();
+        //TODO: create panel contents
+
+        tabbedPane.addTab("Customer", customerPanel);
+
+        mainFrame.add(tabbedPane);
+        mainFrame.revalidate();
+    }
+
+    public void createStorePanel(){
+        Store store = Store.getInstance(mainFrame.getTitle());
+
+        int totalProducts = 0;
+
+        storeDepartPanel = new JPanel();
+        storeProductsPanel = new JPanel();
+        storeButtonsPanel = new JPanel();
+
+        storePanel.setLayout(new FlowLayout());
+
+        String[] departColNames = {"ID", "Name", "# Products"};
+        Object[][] departData = new Object[store.getDepartments().size() + 50][3];
+        int currentDepart = 0;
+
+        for(Department d : store.getDepartments()){
+            departData[currentDepart][0] = d.getID();
+            departData[currentDepart][1] = d.getName();
+            departData[currentDepart][2] = d.getItems().size();
+
+            totalProducts += d.getItems().size();
+
+            currentDepart++;
+        }
+
+        departTable = new JTable(departData, departColNames);
+        departScrollPane = new JScrollPane(departTable);
+        departTable.setFillsViewportHeight(true);
+
+        storeDepartPanel.add(departScrollPane);
+        storePanel.add(storeDepartPanel);
+
+
+        String[] prodColNames = { "Name", "ID", "Price", "Department"};
+        Object[][] prodData = new Object[totalProducts + 1][4];
+        int currentProd = 0;
+
+        for(Department d : store.getDepartments()){
+            for(Item i : d.getItems()){
+                prodData[currentProd][0] = i.getName();
+                prodData[currentProd][1] = i.getID();
+                prodData[currentProd][2] = i.getPrice();
+                prodData[currentProd][3] = d.getName();
+
+                currentProd++;
+            }
+        }
+
+        productTable = new JTable(prodData, prodColNames);
+        prodScrollPane = new JScrollPane(productTable);
+        prodScrollPane.setSize(new Dimension(300, 1000));
+        departTable.setFillsViewportHeight(true);
+
+        storeProductsPanel.add(prodScrollPane);
+        storePanel.add(storeProductsPanel);
+
+        storeButtonsPanel.setLayout(new BoxLayout(storeButtonsPanel, BoxLayout.Y_AXIS));
+
+        sortProductsButton = new JButton("Sort");
+        addProductButton = new JButton("Add Product");
+        modifyProductButton = new JButton("Modify Product");
+        deleteProductButton = new JButton("Delete Product");
+
+        addProductButton.addActionListener(this);
+        sortProductsButton.addActionListener(this);
+
+        storeButtonsPanel.add(sortProductsButton);
+        storeButtonsPanel.add(addProductButton);
+        storeButtonsPanel.add(modifyProductButton);
+        storeButtonsPanel.add(deleteProductButton);
+
+        storePanel.add(storeButtonsPanel);
+
+        mainFrame.revalidate();
+    }
+
+    public void createPopUpAddProduct(){
+        Store store = Store.getInstance("dummy_text");
+
+        JLabel newProdName, newProdID, newProdPrice, newProdDepartment;
+        JPanel mainPopUpPanel;
+        JTextField nameTextField, IDTextField, priceTextField;
+        JComboBox<String> departmentCombo;
+        String[] comboData = new String[4];
+        int currentDepart = 0;
+
+        for(Department d : store.getDepartments()){
+            comboData[currentDepart] = d.getName();
+            currentDepart++;
+        }
+
+        departmentCombo = new JComboBox<>(comboData);
+
+        newProdName = new JLabel("  Name:  ");
+        newProdID = new JLabel("  ID:  ");
+        newProdPrice = new JLabel("  Price:  ");
+        newProdDepartment = new JLabel("  Department:  ");
+
+        nameTextField = new JTextField(20);
+        IDTextField = new JTextField(20);
+        priceTextField = new JTextField(20);
+
+        mainPopUpPanel = new JPanel(new GridLayout(0,1));
+
+        mainPopUpPanel.add(newProdName);
+        mainPopUpPanel.add(nameTextField);
+        mainPopUpPanel.add(newProdID);
+        mainPopUpPanel.add(IDTextField);
+        mainPopUpPanel.add(newProdPrice);
+        mainPopUpPanel.add(priceTextField);
+        mainPopUpPanel.add(newProdDepartment);
+        mainPopUpPanel.add(departmentCombo);
+
+
+        int result = JOptionPane.showConfirmDialog(null, mainPopUpPanel, "Add New Product",
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+        if(result == JOptionPane.OK_OPTION){
+            Item newItem = new Item(nameTextField.getText(), Integer.parseInt(IDTextField.getText()),
+                    Double.parseDouble(priceTextField.getText()));
+
+           store.getDepartments().elementAt(departmentCombo.getSelectedIndex()).addItem(newItem);
+
+           storePanel.removeAll();
+           createStorePanel();
+        }
+    }
+
+    public void createPopUpSortProducts(){
+        JPanel mainPopUpPanel = new JPanel(new GridLayout(0,1));
+        String[] comboData = {"Smallest to Largest (Price)", "Largest to Smallest (Price)", "A to Z", "Z to A"};
+        JComboBox<String> comboBox = new JComboBox<>(comboData);
+
+        mainPopUpPanel.add(comboBox);
+
+        int result = JOptionPane.showConfirmDialog(null, mainPopUpPanel, "Sort Products",
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+        if(result == JOptionPane.OK_OPTION){
+            switch(comboBox.getSelectedIndex()){
+                case 0: // <
+                    break;
+
+                case 1: // >
+                    break;
+
+                case 2: // A-Z
+                    break;
+
+                case 3: //Z-A
+                    break;
+            }
+        }
+
 
     }
 
@@ -95,6 +301,15 @@ public class MainGUI implements ActionListener {
             File customersTxtFile = new File(pathCustomersTxt.getText());
 
             startStore(storeTxtFile, customersTxtFile);
+        }
+
+
+        if(e.getSource() == addProductButton){
+            createPopUpAddProduct();
+        }
+
+        if(e.getSource() == sortProductsButton){
+            createPopUpSortProducts();
         }
     }
 

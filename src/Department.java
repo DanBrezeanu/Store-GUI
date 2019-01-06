@@ -31,6 +31,10 @@ public abstract class Department implements Subject{
         return ID;
     }
 
+    public String getName() {
+        return name;
+    }
+
     public Vector<Item> getItems() {
         return items;
     }
