@@ -6,9 +6,9 @@ import java.util.*;
 public class Test {
     private Store store;
 
-    private void parseStoreTxt() {
+    private void parseStoreTxt(File storeTxt) {
         try {
-            Scanner storeSc = new Scanner(new File("store.txt"));
+            Scanner storeSc = new Scanner(storeTxt);
 
             store = Store.getInstance(storeSc.nextLine());
 
@@ -68,9 +68,9 @@ public class Test {
         }
     }
 
-    private void parseCustomersTxt(){
+    private void parseCustomersTxt(File customersTxt){
         try{
-            Scanner customerSc = new Scanner(new File("customers.txt"));
+            Scanner customerSc = new Scanner(customersTxt);
 
             Integer numberOfCustomers = Integer.parseInt(customerSc.nextLine());
 
@@ -263,8 +263,8 @@ public class Test {
     public static void main(String[] args) {
         Test test = new Test();
 
-        test.parseStoreTxt();
-        test.parseCustomersTxt();
+        test.parseStoreTxt(new File("store.txt"));
+        test.parseCustomersTxt(new File("customers.txt"));
         test.parseEventsTxt();
     }
 }
