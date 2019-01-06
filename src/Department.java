@@ -39,6 +39,14 @@ public abstract class Department implements Subject{
         items.add(newItem);
     }
 
+    public void modifyItem(Integer itemID, Double newPrice){
+        for(Item i : items)
+            if(i.getID().equals(itemID)) {
+                i.setPrice(newPrice);
+                break;
+            }
+    }
+
     public void addObserver(Customer newObserver){
         observers.add(newObserver);
     }

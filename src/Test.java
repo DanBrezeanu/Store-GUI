@@ -97,23 +97,55 @@ public class Test {
 
                 String event = tokenizer.nextToken();
 
+                Integer itemID; Double itemPrice; String itemName;
+                Integer depID;
+
                 switch(event){
                     case "addItem":
+                        itemID = Integer.parseInt(tokenizer.nextToken());
+
+                        //TODO:
                         break;
 
                     case "delItem":
+                        //TODO:
                         break;
 
                     case "addProduct":
+                        depID = Integer.parseInt(tokenizer.nextToken());
+
+                        for(Department d : store.getDepartments())
+                            if(d.getID().equals(depID)) {
+                                itemID = Integer.parseInt(tokenizer.nextToken());
+                                itemPrice = Double.parseDouble(tokenizer.nextToken());
+                                itemName = tokenizer.nextToken();
+
+                                d.addItem(new Item(itemName, itemID, itemPrice));
+                            }
+
                         break;
 
                     case "modifyProduct":
+                        depID = Integer.parseInt(tokenizer.nextToken());
+
+                        for(Department d : store.getDepartments()) {
+                            if (d.getID().equals(depID)) {
+                                itemID = Integer.parseInt(tokenizer.nextToken());
+                                d.modifyItem(itemID, Double.parseDouble(tokenizer.nextToken()));
+
+                                d.notifyAllObservers(new Notification(d.getID(), itemID,
+                                        Notification.NotificationType.MODIFY));
+                            }
+                        }
+
                         break;
 
                     case "delProduct":
+                        //TODO:
                         break;
 
                     case "getItem":
+                        //TODO: Strategy
                         break;
 
                     case "getItems":

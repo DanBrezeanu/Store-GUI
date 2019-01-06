@@ -1,4 +1,5 @@
 import java.util.Collection;
+import java.util.Vector;
 
 public class Customer implements Observer{
     private String name;
@@ -20,6 +21,8 @@ public class Customer implements Observer{
         if(strategy.equals("C"))
             this.strategy = new StrategyC();
 
+        wishlist = new Wishlist();
+        notifications = new Vector<Notification>();
     }
 
     public String getName() {
