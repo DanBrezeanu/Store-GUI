@@ -1,11 +1,41 @@
 import java.util.Comparator;
 
 public class Wishlist extends ItemList {
-    Wishlist(Comparator comparator){
+
+    private Strategy strategy;
+
+    Wishlist(Comparator comparator, String strategy){
         super(comparator);
+
+        if(strategy.equals("A"))
+            this.strategy = new StrategyA();
+
+        if(strategy.equals("B"))
+            this.strategy = new StrategyB();
+
+        if(strategy.equals("C"))
+            this.strategy = new StrategyC();
     }
 
-    Wishlist(){
+    Wishlist(String strategy){
         super();
+
+        if(strategy.equals("A"))
+            this.strategy = new StrategyA();
+
+        if(strategy.equals("B"))
+            this.strategy = new StrategyB();
+
+        if(strategy.equals("C"))
+            this.strategy = new StrategyC();
+    }
+
+
+    public Strategy getStrategy() {
+        return strategy;
+    }
+
+    public void executeStrategy(){
+        strategy.execute(this);
     }
 }

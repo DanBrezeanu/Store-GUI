@@ -1,7 +1,7 @@
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Scanner;
-import java.util.StringTokenizer;
+import java.util.*;
 
 public class Test {
     private Store store;
@@ -98,7 +98,7 @@ public class Test {
                 String event = tokenizer.nextToken();
 
                 Integer itemID; Double itemPrice; String itemName;
-                Integer depID;
+                Integer depID; String customerName; String list;
 
                 switch(event){
                     case "addItem":
@@ -145,13 +145,100 @@ public class Test {
                         break;
 
                     case "getItem":
-                        //TODO: Strategy
+                        customerName = tokenizer.nextToken();
+
+                        for(Customer c : store.getCustomers()){
+                            if(customerName.equals(c.getName())) {
+                                c.getWishlist().executeStrategy();
+                                break;
+                            }
+                        }
                         break;
 
                     case "getItems":
+                        list = tokenizer.nextToken();
+                        customerName = tokenizer.nextToken();
+
+                        for(Customer c : store.getCustomers()){
+                            if(c.getName().equals(customerName)){
+                                if(list.equals("ShoppingCart")){
+                                    FileWriter fw = null;
+
+                                    try{
+                                        fw = new FileWriter("results.txt", true);
+
+                                        fw.write(c.getShoppingCart().toString() + "\n");
+
+                                    }catch(IOException e){
+                                        e.printStackTrace();
+                                    }finally{
+                                        if(fw != null) {
+                                            try {
+                                                fw.close();
+                                            } catch (IOException e) {
+                                                e.printStackTrace();
+                                            }
+                                        }
+                                    }
+                                }
+                                else if(list.equals("WishList")){
+                                    FileWriter fw = null;
+
+                                    try{
+                                        fw = new FileWriter("results.txt", true);
+
+                                        fw.write(c.getWishlist().toString() + "\n");
+
+                                    }catch(IOException e){
+                                        e.printStackTrace();
+                                    }finally{
+                                        if(fw != null) {
+                                            try {
+                                                fw.close();
+                                            } catch (IOException e) {
+                                                e.printStackTrace();
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
                         break;
 
                     case "getTotal":
+                        list = tokenizer.nextToken();
+                        customerName = tokenizer.nextToken();
+                        Double result = 0.0;
+
+                        for(Customer c : store.getCustomers()) {
+                            if (c.getName().equals(customerName)) {
+                                if(list.equals("ShoppingCart"))
+                                    result = c.getShoppingCart().getTotalPrice();
+                                else if(list.equals("WishList"))
+                                    result = c.getShoppingCart().getTotalPrice();
+
+                                break;
+                            }
+                        }
+                        FileWriter fw = null;
+
+                        try{
+                            fw = new FileWriter("results.txt", true);
+
+                            fw.write(result + "\n");
+
+                        }catch(IOException e){
+                            e.printStackTrace();
+                        }finally{
+                            if(fw != null) {
+                                try {
+                                    fw.close();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
                         break;
 
                     case "accept":

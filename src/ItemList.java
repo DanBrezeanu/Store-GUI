@@ -1,5 +1,7 @@
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.ListIterator;
+import java.util.Vector;
 
 public abstract class ItemList {
     private Node<Item> beginning;
@@ -290,6 +292,42 @@ public abstract class ItemList {
 
     public ListIterator<Item> listIterator() {
         return new ItemIterator<Item>(beginning);
+    }
+
+    public Vector<Item> toVector(){
+        ItemIterator<Item> it = new ItemIterator<Item>(beginning);
+        Vector<Item> v = new Vector<Item>();
+
+        while(it.hasNext()){
+            v.add(it.next());
+        }
+
+        return v;
+    }
+
+    public String toString(){
+        Vector<Item> items = this.toVector();
+
+        Collections.sort(items, new Comparator<Item>() {
+            public int compare(Item o1, Item o2) {
+                if (o1.getPrice().equals(o2.getPrice()))
+                    return 0;
+
+                return (o1.getPrice() < o2.getPrice()) ? -1 : 1;
+            }
+        });
+
+        String resultString = "[";
+
+        for (int i = 0; i < items.size(); ++i) {
+            resultString += items.elementAt(i).toString();
+            if (i != items.size() - 1)
+                resultString += ", ";
+        }
+
+        resultString += "]";
+
+        return resultString;
     }
 
     public Double getTotalPrice(){

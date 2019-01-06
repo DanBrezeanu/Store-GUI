@@ -38,4 +38,8 @@ public class Item {
     public Double getPrice() {
         return price;
     }
+
+    public String toString(){
+        return this.name + ";" + this.ID + ";" + this.price;
+    }
 }
