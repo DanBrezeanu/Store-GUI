@@ -116,7 +116,7 @@ public class MainGUI implements ActionListener {
 
 
         customerPanel = new JPanel();
-        //TODO: create panel contents
+        createCustomerPanel();
 
         tabbedPane.addTab("Customer", customerPanel);
 
@@ -203,6 +203,10 @@ public class MainGUI implements ActionListener {
         storePanel.add(storeButtonsPanel);
 
         mainFrame.revalidate();
+    }
+
+    public void createCustomerPanel(){
+
     }
 
     public void createPopUpAddProduct(){
