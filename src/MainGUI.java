@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.ListIterator;
 import java.util.Scanner;
 
 public class MainGUI implements ActionListener {
@@ -59,8 +60,8 @@ public class MainGUI implements ActionListener {
         customersTxt = new JLabel("   customers.txt  ");
         browseStoreTxt = new JButton("Browse..");
         browseCustomersTxt = new JButton("Browse..");
-        pathStoreTxt = new JTextField("C:\\Users\\Dan\\Desktop\\test00\\store.txt"); //TODO: 50
-        pathCustomersTxt = new JTextField("C:\\Users\\Dan\\Desktop\\test00\\customers.txt"); //TODO: 50
+        pathStoreTxt = new JTextField("C:\\Users\\Dan\\Desktop\\test00\\store.txt"); //TODO: new TextField(50)
+        pathCustomersTxt = new JTextField("C:\\Users\\Dan\\Desktop\\test00\\customers.txt"); //TODO: new TextField(50)
 
         importPanel.add(browseStoreTxt, c);
         c.gridx++;
@@ -234,11 +235,33 @@ public class MainGUI implements ActionListener {
     }
 
     public void createShoppingCartPanel(){
+        Store store = Store.getInstance("dummy_text");
         shoppingCartPanel = new JPanel();
         Object[][] tableData = new Object[referenceCustomer.getShoppingCart().size()][4];
+        ListIterator<Item> it = referenceCustomer.getShoppingCart().listIterator();
+        Item currentItem;
+        Integer current = 0;
+
+        while(it.hasNext()){
+            currentItem = it.next();
+
+            tableData[current][0] = currentItem.getName();
+            tableData[current][1] = currentItem.getID();
+            tableData[current][2] = currentItem.getPrice();
+
+            for(Department d : store.getDepartments())
+                for(Item i : d.getItems())
+                    if(i.equals(currentItem))
+                        tableData[current][3] = d.getName();
+        }
 
 
-        JTable shoppingCartTable = new JTable();
+        JTable shoppingCartTable = new JTable(tableData, prodColNames);
+        JScrollPane shoppingCartScrollPane = new JScrollPane(shoppingCartTable);
+        shoppingCartTable.setFillsViewportHeight(true);
+
+        shoppingCartPanel.add(shoppingCartScrollPane);
+
 
 
 

@@ -103,8 +103,19 @@ public class Test {
                 switch(event){
                     case "addItem":
                         itemID = Integer.parseInt(tokenizer.nextToken());
+                        list = tokenizer.nextToken();
+                        customerName = tokenizer.nextToken();
 
-                        //TODO:
+                        for(Customer c : store.getCustomers())
+                            if(c.getName().equals(customerName))
+                                for(Department d : store.getDepartments())
+                                    for(Item item : d.getItems())
+                                        if(item.getID().equals(itemID)){
+                                            if(list.equals("ShoppingCart"))
+                                                c.getShoppingCart().add(item);
+                                            else if(list.equals("WishList"))
+                                                c.getWishlist().add(item);
+                                        }
                         break;
 
                     case "delItem":
