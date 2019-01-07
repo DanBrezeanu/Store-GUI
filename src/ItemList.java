@@ -309,6 +309,18 @@ public abstract class ItemList {
         return v;
     }
 
+    public int size(){
+        ListIterator<Item> it = this.listIterator();
+        int size = 0;
+
+        while(it.hasNext()){
+            it.next();
+            size++;
+        }
+
+        return size;
+    }
+
     public String toString(){
         Vector<Item> items = this.toVector();
 

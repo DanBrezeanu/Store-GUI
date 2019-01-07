@@ -2,6 +2,8 @@ import com.sun.javafx.beans.IDProperty;
 import sun.applet.Main;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -28,10 +30,13 @@ public class MainGUI implements ActionListener {
     private JPanel storeDepartPanel, storeProductsPanel, storeButtonsPanel;
     private JButton addProductButton, sortProductsButton, modifyProductButton, deleteProductButton;
 
-    private JFrame popUpFrame;
-
     private String[] prodColNames = { "Name", "ID", "Price", "Department"};
     private Object[][] prodData;
+
+    private JTabbedPane customerTabbedPane;
+    private JPanel shoppingCartPanel, wishListPanel;
+    private Customer referenceCustomer = null;
+    private JPanel selectCustomerPanel;
 
 
     MainGUI(){
@@ -88,7 +93,7 @@ public class MainGUI implements ActionListener {
         mainFrame.setVisible(true);
     }
 
-    void startStore(File storeFile, File customersFile){
+    public void startStore(File storeFile, File customersFile){
         Test testObj = new Test();
         Store store;
 
@@ -116,9 +121,10 @@ public class MainGUI implements ActionListener {
 
 
         customerPanel = new JPanel();
-        //TODO: create panel contents
 
         tabbedPane.addTab("Customer", customerPanel);
+
+       createCustomerPanel();
 
         mainFrame.add(tabbedPane);
         mainFrame.revalidate();
@@ -203,6 +209,99 @@ public class MainGUI implements ActionListener {
         storePanel.add(storeButtonsPanel);
 
         mainFrame.revalidate();
+    }
+
+    public void createCustomerPanel(){
+        customerTabbedPane = new JTabbedPane();
+        customerTabbedPane.setPreferredSize(new Dimension(Toolkit.getDefaultToolkit().getScreenSize()));
+
+        createSelectCustomerPanel();
+
+        shoppingCartPanel = selectCustomerPanel;
+        customerTabbedPane.addTab("Shopping Cart", shoppingCartPanel);
+
+        createWishListPanel();
+
+        customerTabbedPane.addTab("Wishlist", wishListPanel);
+
+        customerPanel.add(customerTabbedPane);
+
+
+
+
+
+
+    }
+
+    public void createShoppingCartPanel(){
+        shoppingCartPanel = new JPanel();
+        Object[][] tableData = new Object[referenceCustomer.getShoppingCart().size()][4];
+
+
+        JTable shoppingCartTable = new JTable();
+
+
+
+
+
+
+        createWishListPanel();
+        customerTabbedPane.removeAll();
+        customerTabbedPane.add(shoppingCartPanel, "Shopping Cart");
+        customerTabbedPane.add(wishListPanel, "Wishlist");
+        customerTabbedPane.revalidate();
+
+    }
+
+    public void createWishListPanel(){
+        if(referenceCustomer != null){
+
+            wishListPanel = new JPanel();
+            wishListPanel.add(new JLabel("ok2"));
+        }
+    }
+
+    public void createSelectCustomerPanel(){
+        Store store = Store.getInstance("dummy_text");
+
+        selectCustomerPanel = new JPanel();
+        selectCustomerPanel.setLayout(new BoxLayout(selectCustomerPanel, BoxLayout.Y_AXIS));
+        JLabel selectCustomerName = new JLabel("Customer name:");
+        JTextField selectCustomerTextField = new JTextField(40);
+        JButton selectCustomerButton = new JButton("OK");
+
+        selectCustomerButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                for(Customer c : store.getCustomers())
+                    if(c.getName().equals(selectCustomerTextField.getText())){
+                        referenceCustomer = c;
+
+                        createShoppingCartPanel();
+                        return;
+
+                    }
+
+                if(referenceCustomer == null)
+                    JOptionPane.showMessageDialog( mainFrame, "Customer does not exist" );
+            }
+        });
+
+        selectCustomerName.setAlignmentX(Component.CENTER_ALIGNMENT);
+        selectCustomerTextField.setAlignmentX(Component.CENTER_ALIGNMENT);
+        selectCustomerButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+
+
+        selectCustomerPanel.add(selectCustomerName);
+        selectCustomerName.setMaximumSize(new Dimension(100,20));
+        selectCustomerPanel.add(selectCustomerTextField);
+        selectCustomerTextField.setMaximumSize(new Dimension(200,20));
+        selectCustomerPanel.add(new Box.Filler(new Dimension(10,10), new Dimension(10,10),
+                new Dimension(10,10)));
+        selectCustomerPanel.add(selectCustomerButton);
+        selectCustomerButton.setMaximumSize(new Dimension(70,20));
+
     }
 
     public void createPopUpAddProduct(){
@@ -364,16 +463,18 @@ public class MainGUI implements ActionListener {
 
         mainPopUpPanel.add(modifyIDProd);
         mainPopUpPanel.add(modifyIDProdText);
+        modifyIDProdText.setMaximumSize(new Dimension(50, 20));
 
 
         int result = JOptionPane.showConfirmDialog(null, mainPopUpPanel, "Select ID to modify",
                 JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 
         if(result == JOptionPane.OK_OPTION){
-            for(Department d : store.getDepartments())
-                for(Item i : d.getItems())
-                    if(i.getID().equals(Integer.parseInt(modifyIDProdText.getText())))
-                        referenceItem = i;
+            if(modifyIDProdText.getText().length() != 0)
+                for (Department d : store.getDepartments())
+                    for (Item i : d.getItems())
+                        if (i.getID().equals(Integer.parseInt(modifyIDProdText.getText())))
+                            referenceItem = i;
 
             if(referenceItem == null){
                 JOptionPane.showMessageDialog(mainPopUpPanel, "Product does not exist" );
