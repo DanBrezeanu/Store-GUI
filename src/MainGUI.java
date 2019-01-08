@@ -230,7 +230,10 @@ public class MainGUI implements ActionListener {
         customerTabbedPane = new JTabbedPane();
         customerTabbedPane.setPreferredSize(new Dimension(Toolkit.getDefaultToolkit().getScreenSize()));
 
-        createSelectCustomerPanel();
+        if(referenceCustomer == null)
+            createSelectCustomerPanel();
+        else
+            createShoppingCartPanel();
 
         shoppingCartPanel = selectCustomerPanel;
         customerTabbedPane.addTab("Shopping Cart", shoppingCartPanel);
@@ -840,17 +843,27 @@ public class MainGUI implements ActionListener {
                     "Confirm", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
             if(result2 == JOptionPane.OK_OPTION) {
                 for (Customer c : store.getCustomers()) {
-                    if (c.getShoppingCart().contains(referenceItem))
+                    if (c.getShoppingCart().contains(referenceItem)) {
                         c.getShoppingCart().remove(referenceItem);
+
+                        if(referenceCustomer == c){
+                            customerPanel.removeAll();
+                            createCustomerPanel();
+                        }
+                    }
 
                     if (c.getWishlist().contains(referenceItem))
                         c.getWishlist().remove(referenceItem);
+
                 }
 
                 for (Department d : store.getDepartments()) {
                     if (d.getItems().contains(referenceItem))
                         d.getItems().remove(referenceItem);
                 }
+
+                storePanel.removeAll();
+                createStorePanel();
             }
 
         }
