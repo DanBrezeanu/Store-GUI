@@ -97,8 +97,8 @@ public abstract class ItemList {
             if(current == null) //1st element
                 return false;
 
-            if (current.getNext() == null)
-                return false;
+//            if (current.getNext() == null)
+//                return false;
 
             return true;
         }
@@ -151,8 +151,15 @@ public abstract class ItemList {
                 currentNode = currentNode.getNext();
             }
 
-            currentNode.getNext().setPrev(currentNode.getPrev());
-            currentNode.getPrev().setNext(currentNode.getNext());
+            if(currentNode.getNext() != null && currentNode.getPrev() != null) {
+                currentNode.getNext().setPrev(currentNode.getPrev());
+                currentNode.getPrev().setNext(currentNode.getNext());
+            }
+
+            if(currentNode.getPrev() == null && currentNode.getNext() == null){   //single element
+              first = null;
+              end = null;
+            }
             currentNode = null;
             lastParsedIndex = -1; lastParsed = null;
 

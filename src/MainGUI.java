@@ -10,10 +10,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.ListIterator;
-import java.util.Scanner;
+import java.util.*;
+import java.util.List;
 
 public class MainGUI implements ActionListener {
     private JFrame mainFrame;
@@ -42,7 +40,18 @@ public class MainGUI implements ActionListener {
 
     JTable shoppingCartTable;
     JScrollPane shoppingCartScrollPane;
+    JLabel valueShoppingCartLabel = new JLabel();
 
+    public Double findShoppingCartTotal(){
+        Double totalValue = 0.0;
+        ListIterator<Item> it = referenceCustomer.getShoppingCart().listIterator();
+
+        while(it.hasNext()){
+            totalValue += it.next().getPrice();
+        }
+
+        return totalValue;
+    }
 
     MainGUI(){
         mainFrame = new JFrame("Store");
@@ -242,26 +251,32 @@ public class MainGUI implements ActionListener {
         Store store = Store.getInstance("dummy_text");
         shoppingCartPanel = new JPanel(new FlowLayout());
         JPanel tableShoppingCartPanel = new JPanel();
-        Object[][] tableData = new Object[referenceCustomer.getShoppingCart().size()][4];
         ListIterator<Item> it = referenceCustomer.getShoppingCart().listIterator();
         Item currentItem;
         Integer current = 0;
 
+        DefaultTableModel tableModel = new DefaultTableModel();
+        for(String s : prodColNames)
+            tableModel.addColumn(s);
+
         while(it.hasNext()){
             currentItem = it.next();
+            Vector<Object> newRow = new Vector<>();
 
-            tableData[current][0] = currentItem.getName();
-            tableData[current][1] = currentItem.getID();
-            tableData[current][2] = currentItem.getPrice();
+
+            newRow.add(currentItem.getName());
+            newRow.add(currentItem.getID());
+            newRow.add(currentItem.getPrice());
 
             for(Department d : store.getDepartments())
                 for(Item i : d.getItems())
                     if(i.equals(currentItem))
-                        tableData[current][3] = d.getID();
+                        newRow.add(d.getID());
         }
 
 
-        shoppingCartTable = new JTable(tableData, prodColNames);
+        shoppingCartTable = new JTable(tableModel);
+
         shoppingCartScrollPane = new JScrollPane(shoppingCartTable);
         shoppingCartTable.setFillsViewportHeight(true);
 
@@ -272,11 +287,12 @@ public class MainGUI implements ActionListener {
         JPanel buttonsShoppingCartPanel = new JPanel(new GridLayout(0,1));
         JButton addNewItemShoppingCartButton = new JButton("Add item");
         JButton deleteItemShoppingCartButton = new JButton("Delete item");
+        JButton finaliseOrderShoppingCartButton = new JButton("Finalise order");
 
         addNewItemShoppingCartButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                Item refItem = createPopUpAddToShoppingCart();
+                Item refItem = createPopUpAddRemoveToShoppingCart();
 
                 if(refItem != null) {
                     referenceCustomer.getShoppingCart().add(refItem);
@@ -290,18 +306,82 @@ public class MainGUI implements ActionListener {
                                 newEntry[3] = d.getID();
 
                     ((DefaultTableModel)shoppingCartTable.getModel()).addRow(newEntry);
+                    shoppingCartTable.revalidate();
+                    shoppingCartScrollPane.revalidate();
+
+                    valueShoppingCartLabel.setText("           " + findShoppingCartTotal().toString());
 
                 }
             }
         });
 
+        deleteItemShoppingCartButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Item refItem = createPopUpAddRemoveToShoppingCart();
+                boolean removedItem = false;
+                ListIterator<Item> it = referenceCustomer.getShoppingCart().listIterator();
+
+                if(refItem == null){
+                    JOptionPane.showMessageDialog(mainFrame, "Product does not exist");
+                    return;
+                }
+
+                while(it.hasNext()) {
+                    Item currentItem = it.next();
+                    if (currentItem.getID().equals(refItem.getID()))
+                        for (int i = 0; i < shoppingCartTable.getModel().getRowCount(); ++i)
+                            if ((shoppingCartTable.getModel().getValueAt(i, 1)).equals(refItem.getID())) {
+                                DefaultTableModel shoppingCartTableModel = (DefaultTableModel) shoppingCartTable.getModel();
+                                shoppingCartTableModel.removeRow(i);
+                                referenceCustomer.getShoppingCart().remove(refItem);
+                                shoppingCartTable.revalidate();
+                                removedItem = true;
+                                valueShoppingCartLabel.setText("           " + findShoppingCartTotal().toString());
+                                break;
+                            }
+                }
+
+                if(!removedItem){
+                    JOptionPane.showMessageDialog(mainFrame, "Product is not in shopping cart");
+                }
+
+                shoppingCartTable.revalidate();
+                shoppingCartScrollPane.revalidate();
+            }
+        });
+
         buttonsShoppingCartPanel.add(addNewItemShoppingCartButton);
+        buttonsShoppingCartPanel.add(new JLabel(" ")); //filler
         buttonsShoppingCartPanel.add(deleteItemShoppingCartButton);
+        buttonsShoppingCartPanel.add(new JLabel(" ")); //filler
+        buttonsShoppingCartPanel.add(new JLabel(" ")); //filler
+        buttonsShoppingCartPanel.add(new JLabel(" ")); //filler
+        buttonsShoppingCartPanel.add(finaliseOrderShoppingCartButton);
+
 
         shoppingCartPanel.add(buttonsShoppingCartPanel);
 
 
+        JPanel infoShoppingCartPanel = new JPanel(new GridLayout(0,1));
+        JLabel maximumBudgetLabel = new JLabel("           Total budget:");
+        JLabel valueBudgetLabel = new JLabel("           " + referenceCustomer.getShoppingCart().getBudget().toString());
+        JLabel totalShopppingCartLabel = new JLabel("           Total products:");
 
+
+        Double totalValue = findShoppingCartTotal();
+
+        valueShoppingCartLabel.setText("           " + totalValue.toString());
+
+        infoShoppingCartPanel.add(maximumBudgetLabel);
+
+        infoShoppingCartPanel.add(valueBudgetLabel);
+        infoShoppingCartPanel.add(new JLabel(" "));
+        infoShoppingCartPanel.add(totalShopppingCartLabel);
+        infoShoppingCartPanel.add(valueShoppingCartLabel);
+
+
+        shoppingCartPanel.add(infoShoppingCartPanel);
         createWishListPanel();
         customerTabbedPane.removeAll();
         customerTabbedPane.add(shoppingCartPanel, "Shopping Cart");
@@ -413,7 +493,7 @@ public class MainGUI implements ActionListener {
         }
     }
 
-    public Item createPopUpAddToShoppingCart(){
+    public Item createPopUpAddRemoveToShoppingCart(){
         Store store = Store.getInstance("dummy_text");
 
         JPanel mainPopUpPanel = new JPanel(new GridLayout(0,1));
@@ -426,7 +506,7 @@ public class MainGUI implements ActionListener {
         modifyIDProdText.setMaximumSize(new Dimension(50, 20));
 
 
-        int result = JOptionPane.showConfirmDialog(null, mainPopUpPanel, "Select ID to modify",
+        int result = JOptionPane.showConfirmDialog(null, mainPopUpPanel, "Select ID",
                 JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 
         if(result == JOptionPane.OK_OPTION){
