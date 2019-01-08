@@ -518,7 +518,7 @@ public class MainGUI implements ActionListener {
                     if(c.getName().equals(selectCustomerTextField.getText())){
                         referenceCustomer = c;
 
-                        createShoppingCartPanel();
+                        createShoppingCartPanel();;
                         return;
 
                     }
