@@ -38,8 +38,8 @@ public class MainGUI implements ActionListener {
     private Customer referenceCustomer = null;
     private JPanel selectCustomerPanel;
 
-    JTable shoppingCartTable;
-    JScrollPane shoppingCartScrollPane;
+    JTable shoppingCartTable, wishListTable;
+    JScrollPane shoppingCartScrollPane, wishListScrollPane;
     JLabel valueShoppingCartLabel = new JLabel();
 
     public Double findShoppingCartTotal(){
@@ -242,9 +242,6 @@ public class MainGUI implements ActionListener {
 
 
 
-
-
-
     }
 
     public void createShoppingCartPanel(){
@@ -393,8 +390,115 @@ public class MainGUI implements ActionListener {
     public void createWishListPanel(){
         if(referenceCustomer != null){
 
-            wishListPanel = new JPanel();
-            wishListPanel.add(new JLabel("ok2"));
+
+            Store store = Store.getInstance("dummy_text");
+            wishListPanel = new JPanel(new FlowLayout());
+            JPanel tableWishListPanel = new JPanel();
+            ListIterator<Item> it = referenceCustomer.getWishlist().listIterator();
+            Item currentItem;
+            Integer current = 0;
+
+            DefaultTableModel tableModel = new DefaultTableModel();
+            for(String s : prodColNames)
+                tableModel.addColumn(s);
+
+            while(it.hasNext()){
+                currentItem = it.next();
+                Vector<Object> newRow = new Vector<>();
+
+
+                newRow.add(currentItem.getName());
+                newRow.add(currentItem.getID());
+                newRow.add(currentItem.getPrice());
+
+                for(Department d : store.getDepartments())
+                    for(Item i : d.getItems())
+                        if(i.equals(currentItem))
+                            newRow.add(d.getID());
+            }
+
+
+            wishListTable = new JTable(tableModel);
+
+            wishListScrollPane = new JScrollPane(wishListTable);
+            wishListTable.setFillsViewportHeight(true);
+
+            tableWishListPanel.add(wishListScrollPane);
+            wishListPanel.add(tableWishListPanel);
+
+
+            JPanel buttonsWishListPanel = new JPanel(new GridLayout(0,1));
+            JButton addNewItemWishListButton = new JButton("Add item");
+            JButton deleteItemWishListButton = new JButton("Delete item");
+
+            addNewItemWishListButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    Item refItem = createPopUpAddRemoveToShoppingCart();
+
+                    if(refItem != null) {
+                        referenceCustomer.getWishlist().add(refItem);
+                        Object[] newEntry = new Object[4];
+                        newEntry[0] = refItem.getName(); newEntry[1] = refItem.getID();
+                        newEntry[2] = refItem.getPrice();
+
+                        for(Department d : store.getDepartments())
+                            for(Item i : d.getItems())
+                                if(i.equals(refItem))
+                                    newEntry[3] = d.getID();
+
+                        ((DefaultTableModel)wishListTable.getModel()).addRow(newEntry);
+                        wishListTable.revalidate();
+                        wishListScrollPane.revalidate();
+
+                    }
+                }
+            });
+
+            deleteItemWishListButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    Item refItem = createPopUpAddRemoveToShoppingCart();
+                    boolean removedItem = false;
+                    ListIterator<Item> it = referenceCustomer.getWishlist().listIterator();
+
+                    if(refItem == null){
+                        JOptionPane.showMessageDialog(mainFrame, "Product does not exist");
+                        return;
+                    }
+
+                    while(it.hasNext()) {
+                        Item currentItem = it.next();
+                        if (currentItem.getID().equals(refItem.getID()))
+                            for (int i = 0; i < wishListTable.getModel().getRowCount(); ++i)
+                                if ((wishListTable.getModel().getValueAt(i, 1)).equals(refItem.getID())) {
+                                    DefaultTableModel wishListTableModel = (DefaultTableModel) wishListTable.getModel();
+                                    wishListTableModel.removeRow(i);
+                                    referenceCustomer.getWishlist().remove(refItem);
+                                    wishListTable.revalidate();
+                                    removedItem = true;
+                                    break;
+                                }
+                    }
+
+                    if(!removedItem){
+                        JOptionPane.showMessageDialog(mainFrame, "Product is not in wishlist");
+                    }
+
+                    wishListTable.revalidate();
+                    wishListScrollPane.revalidate();
+                }
+            });
+
+            buttonsWishListPanel.add(addNewItemWishListButton);
+            buttonsWishListPanel.add(new JLabel(" ")); //filler
+            buttonsWishListPanel.add(new JLabel(" ")); //filler
+            buttonsWishListPanel.add(deleteItemWishListButton);
+
+
+
+           wishListPanel.add(buttonsWishListPanel);
+
         }
     }
 
