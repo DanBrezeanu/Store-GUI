@@ -4,6 +4,7 @@ import sun.applet.Main;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -38,6 +39,9 @@ public class MainGUI implements ActionListener {
     private JPanel shoppingCartPanel, wishListPanel;
     private Customer referenceCustomer = null;
     private JPanel selectCustomerPanel;
+
+    JTable shoppingCartTable;
+    JScrollPane shoppingCartScrollPane;
 
 
     MainGUI(){
@@ -236,7 +240,8 @@ public class MainGUI implements ActionListener {
 
     public void createShoppingCartPanel(){
         Store store = Store.getInstance("dummy_text");
-        shoppingCartPanel = new JPanel();
+        shoppingCartPanel = new JPanel(new FlowLayout());
+        JPanel tableShoppingCartPanel = new JPanel();
         Object[][] tableData = new Object[referenceCustomer.getShoppingCart().size()][4];
         ListIterator<Item> it = referenceCustomer.getShoppingCart().listIterator();
         Item currentItem;
@@ -252,19 +257,48 @@ public class MainGUI implements ActionListener {
             for(Department d : store.getDepartments())
                 for(Item i : d.getItems())
                     if(i.equals(currentItem))
-                        tableData[current][3] = d.getName();
+                        tableData[current][3] = d.getID();
         }
 
 
-        JTable shoppingCartTable = new JTable(tableData, prodColNames);
-        JScrollPane shoppingCartScrollPane = new JScrollPane(shoppingCartTable);
+        shoppingCartTable = new JTable(tableData, prodColNames);
+        shoppingCartScrollPane = new JScrollPane(shoppingCartTable);
         shoppingCartTable.setFillsViewportHeight(true);
 
-        shoppingCartPanel.add(shoppingCartScrollPane);
+        tableShoppingCartPanel.add(shoppingCartScrollPane);
+        shoppingCartPanel.add(tableShoppingCartPanel);
 
 
+        JPanel buttonsShoppingCartPanel = new JPanel(new GridLayout(0,1));
+        JButton addNewItemShoppingCartButton = new JButton("Add item");
+        JButton deleteItemShoppingCartButton = new JButton("Delete item");
 
+        addNewItemShoppingCartButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Item refItem = createPopUpAddToShoppingCart();
 
+                if(refItem != null) {
+                    referenceCustomer.getShoppingCart().add(refItem);
+                    Object[] newEntry = new Object[4];
+                    newEntry[0] = refItem.getName(); newEntry[1] = refItem.getID();
+                    newEntry[2] = refItem.getPrice();
+
+                    for(Department d : store.getDepartments())
+                        for(Item i : d.getItems())
+                            if(i.equals(refItem))
+                                newEntry[3] = d.getID();
+
+                    ((DefaultTableModel)shoppingCartTable.getModel()).addRow(newEntry);
+
+                }
+            }
+        });
+
+        buttonsShoppingCartPanel.add(addNewItemShoppingCartButton);
+        buttonsShoppingCartPanel.add(deleteItemShoppingCartButton);
+
+        shoppingCartPanel.add(buttonsShoppingCartPanel);
 
 
 
@@ -377,6 +411,40 @@ public class MainGUI implements ActionListener {
            storePanel.removeAll();
            createStorePanel();
         }
+    }
+
+    public Item createPopUpAddToShoppingCart(){
+        Store store = Store.getInstance("dummy_text");
+
+        JPanel mainPopUpPanel = new JPanel(new GridLayout(0,1));
+        JLabel modifyIDProd = new JLabel("ID:");
+        JTextField modifyIDProdText = new JTextField(50);
+        Item referenceItem = null;
+
+        mainPopUpPanel.add(modifyIDProd);
+        mainPopUpPanel.add(modifyIDProdText);
+        modifyIDProdText.setMaximumSize(new Dimension(50, 20));
+
+
+        int result = JOptionPane.showConfirmDialog(null, mainPopUpPanel, "Select ID to modify",
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+        if(result == JOptionPane.OK_OPTION){
+            if(modifyIDProdText.getText().length() != 0)
+                for (Department d : store.getDepartments())
+                    for (Item i : d.getItems())
+                        if (i.getID().equals(Integer.parseInt(modifyIDProdText.getText())))
+                            referenceItem = i;
+
+            if(referenceItem == null){
+                JOptionPane.showMessageDialog(mainPopUpPanel, "Product does not exist" );
+                return null;
+            }
+
+            return referenceItem;
+        }
+
+        return null;
     }
 
     public void createPopUpSortProducts(){

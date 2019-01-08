@@ -94,7 +94,10 @@ public abstract class ItemList {
 
         @Override
         public boolean hasNext() {
-            if (current.getNext().equals(null))
+            if(current == null) //1st element
+                return false;
+
+            if (current.getNext() == null)
                 return false;
 
             return true;
@@ -193,6 +196,14 @@ public abstract class ItemList {
 
     public boolean add(Item element) {
         Node<Item> newNode = new Node<Item>(element, null, end);
+
+        if(beginning == null){
+            beginning = newNode;
+            end = newNode;
+
+            return true;
+        }
+
         end.setNext(newNode);
         end = newNode;
 
