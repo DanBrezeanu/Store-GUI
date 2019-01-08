@@ -208,6 +208,7 @@ public class MainGUI implements ActionListener {
         addProductButton.addActionListener(this);
         sortProductsButton.addActionListener(this);
         modifyProductButton.addActionListener(this);
+        deleteProductButton.addActionListener(this);
 
         storeButtonsPanel.add(sortProductsButton);
         storeButtonsPanel.add(new Box.Filler(new Dimension(10,20), new Dimension(20,10),
@@ -756,6 +757,8 @@ public class MainGUI implements ActionListener {
                 return;
             }
         }
+        else if(result == JOptionPane.CANCEL_OPTION)
+            return;
 
         JLabel newProdName, newProdID, newProdPrice, newProdDepartment;
         JTextField nameTextField, IDTextField, priceTextField;
@@ -805,6 +808,57 @@ public class MainGUI implements ActionListener {
         }
     }
 
+    public void createPopUpDeleteProduct(){
+        Store store = Store.getInstance("dummy_text");
+
+        JPanel mainPopUpPanel = new JPanel(new GridLayout(0,1));
+        JLabel deleteIDProd = new JLabel("ID:");
+        JTextField deleteIDProdText = new JTextField(50);
+        Item referenceItem = null;
+
+        mainPopUpPanel.add(deleteIDProd);
+        mainPopUpPanel.add(deleteIDProdText);
+        deleteIDProdText.setMaximumSize(new Dimension(50, 20));
+
+
+        int result = JOptionPane.showConfirmDialog(null, mainPopUpPanel, "Select ID to delete",
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+        if(result == JOptionPane.OK_OPTION){
+            if(deleteIDProdText.getText().length() != 0)
+                for (Department d : store.getDepartments())
+                    for (Item i : d.getItems())
+                        if (i.getID().equals(Integer.parseInt(deleteIDProdText.getText())))
+                            referenceItem = i;
+
+            if(referenceItem == null){
+                JOptionPane.showMessageDialog(mainPopUpPanel, "Product does not exist" );
+                return;
+            }
+
+            int result2 = JOptionPane.showConfirmDialog(null, new JPanel().add(new JLabel("Are you sure?")),
+                    "Confirm", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+            if(result2 == JOptionPane.OK_OPTION) {
+                for (Customer c : store.getCustomers()) {
+                    if (c.getShoppingCart().contains(referenceItem))
+                        c.getShoppingCart().remove(referenceItem);
+
+                    if (c.getWishlist().contains(referenceItem))
+                        c.getWishlist().remove(referenceItem);
+                }
+
+                for (Department d : store.getDepartments()) {
+                    if (d.getItems().contains(referenceItem))
+                        d.getItems().remove(referenceItem);
+                }
+            }
+
+        }
+        else if(result == JOptionPane.CANCEL_OPTION)
+            return;
+
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
         if(e.getSource() == browseStoreTxt){
@@ -843,6 +897,10 @@ public class MainGUI implements ActionListener {
 
         if(e.getSource() == modifyProductButton){
             createPopUpModifyProduct();
+        }
+
+        if(e.getSource() == deleteProductButton){
+            createPopUpDeleteProduct();
         }
     }
 
