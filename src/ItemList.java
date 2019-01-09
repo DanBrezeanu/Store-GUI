@@ -85,7 +85,7 @@ public abstract class ItemList {
             this.first = first;
             this.current = first;
 
-            for (int i = 0; i < index; ++i)
+            for (int i = 0; i < index - 1 ; ++i)
                 this.current = this.current.getNext();
 
 
@@ -193,7 +193,7 @@ public abstract class ItemList {
         }
 
         public Node<T> getNode() {
-            return first;
+            return current;
         }
 
         public int getIndex() {

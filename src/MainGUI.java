@@ -73,8 +73,8 @@ public class MainGUI implements ActionListener {
         customersTxt = new JLabel("   customers.txt  ");
         browseStoreTxt = new JButton("Browse..");
         browseCustomersTxt = new JButton("Browse..");
-        pathStoreTxt = new JTextField("C:\\Users\\Dan\\Desktop\\test00\\store.txt"); //TODO: new TextField(50)
-        pathCustomersTxt = new JTextField("C:\\Users\\Dan\\Desktop\\test00\\customers.txt"); //TODO: new TextField(50)
+        pathStoreTxt = new JTextField("C:\\Users\\nxf51086\\IdeaProjects\\Tema11\\store.txt"); //TODO: new TextField(50)
+        pathCustomersTxt = new JTextField("C:\\Users\\nxf51086\\IdeaProjects\\Tema11\\customers.txt"); //TODO: new TextField(50)
 
         importPanel.add(browseStoreTxt, c);
         c.gridx++;
@@ -238,7 +238,8 @@ public class MainGUI implements ActionListener {
         shoppingCartPanel = selectCustomerPanel;
         customerTabbedPane.addTab("Shopping Cart", shoppingCartPanel);
 
-        createWishListPanel();
+        if(referenceCustomer == null)
+            createWishListPanel();
 
         customerTabbedPane.addTab("Wishlist", wishListPanel);
 
@@ -273,6 +274,8 @@ public class MainGUI implements ActionListener {
                 for(Item i : d.getItems())
                     if(i.equals(currentItem))
                         newRow.add(d.getID());
+
+            tableModel.addRow(newRow);
         }
 
 
@@ -419,6 +422,8 @@ public class MainGUI implements ActionListener {
                     for(Item i : d.getItems())
                         if(i.equals(currentItem))
                             newRow.add(d.getID());
+
+                    tableModel.addRow(newRow);
             }
 
 
@@ -623,11 +628,11 @@ public class MainGUI implements ActionListener {
                     for (Item i : d.getItems())
                         if (i.getID().equals(Integer.parseInt(modifyIDProdText.getText())))
                             referenceItem = i;
-
-            if(referenceItem == null){
-                JOptionPane.showMessageDialog(mainPopUpPanel, "Product does not exist" );
-                return null;
-            }
+//
+//            if(referenceItem == null){
+//                JOptionPane.showMessageDialog(mainPopUpPanel, "Product does not exist" );
+//                return null;
+//            }
 
             return referenceItem;
         }
@@ -843,17 +848,94 @@ public class MainGUI implements ActionListener {
                     "Confirm", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
             if(result2 == JOptionPane.OK_OPTION) {
                 for (Customer c : store.getCustomers()) {
+                    boolean customerHadTheItem = false;
                     if (c.getShoppingCart().contains(referenceItem)) {
                         c.getShoppingCart().remove(referenceItem);
 
+                        if(c == referenceCustomer)
+                         customerHadTheItem = true;
+                    }
+
+                    if (c.getWishlist().contains(referenceItem)) {
+                        c.getWishlist().remove(referenceItem);
+
+                        if(c == referenceCustomer)
+                            customerHadTheItem = true;
+                    }
+
+
+                    //TODO: V   REVALIDATE TOTAL LABELS
+                    if(customerHadTheItem){
                         if(referenceCustomer == c){
-                            customerPanel.removeAll();
-                            createCustomerPanel();
+                            ListIterator<Item> it = referenceCustomer.getShoppingCart().listIterator();
+                            Item currentItem;
+                            Integer current = 0;
+
+                            DefaultTableModel tableModel = new DefaultTableModel();
+                            for(String s : prodColNames)
+                                tableModel.addColumn(s);
+
+                            while(it.hasNext()){
+                                currentItem = it.next();
+                                Vector<Object> newRow = new Vector<>();
+
+
+                                newRow.add(currentItem.getName());
+                                newRow.add(currentItem.getID());
+                                newRow.add(currentItem.getPrice());
+
+                                for(Department d : store.getDepartments())
+                                    for(Item i : d.getItems())
+                                        if(i.equals(currentItem)) {
+                                            newRow.add(d.getID());
+                                            break;
+                                        }
+
+                                tableModel.addRow(newRow);
+                            }
+
+
+                            shoppingCartTable.setModel(tableModel);
+
+                            shoppingCartScrollPane.revalidate();
+                            shoppingCartTable.setFillsViewportHeight(true);
+                            shoppingCartPanel.revalidate();
                         }
                     }
 
-                    if (c.getWishlist().contains(referenceItem))
-                        c.getWishlist().remove(referenceItem);
+                    if(customerHadTheItem){
+                        ListIterator<Item> it = referenceCustomer.getWishlist().listIterator();
+                        Item currentItem;
+                        Integer current = 0;
+
+                        DefaultTableModel tableModel = new DefaultTableModel();
+                        for(String s : prodColNames)
+                            tableModel.addColumn(s);
+
+                        while(it.hasNext()){
+                            currentItem = it.next();
+                            Vector<Object> newRow = new Vector<>();
+
+
+                            newRow.add(currentItem.getName());
+                            newRow.add(currentItem.getID());
+                            newRow.add(currentItem.getPrice());
+
+                            for(Department d : store.getDepartments())
+                                for(Item i : d.getItems())
+                                    if(i.equals(currentItem))
+                                        newRow.add(d.getID());
+
+                            tableModel.addRow(newRow);
+                        }
+
+
+                        wishListTable.setModel(tableModel);
+
+                        wishListScrollPane.revalidate();
+                        wishListTable.setFillsViewportHeight(true);
+                        wishListPanel.revalidate();
+                    }
 
                 }
 
