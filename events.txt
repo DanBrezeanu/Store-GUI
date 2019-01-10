@@ -1,5 +1,6 @@
 25
 addItem;100;ShoppingCart;Andrei
+modifyProduct;1;100;30.01
 addItem;104;WishList;Mihai
 addProduct;1;111;4.25;Mara - Ioan Slavici
 addProduct;1;112;4.45;Proza si teatru - V. Alecsandri

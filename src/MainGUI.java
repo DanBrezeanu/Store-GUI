@@ -298,23 +298,58 @@ public class MainGUI implements ActionListener {
             public void actionPerformed(ActionEvent e) {
                 Item refItem = createPopUpAddRemoveToShoppingCart();
 
-                if(refItem != null) {
+//                if(refItem != null) {
+//                    referenceCustomer.getShoppingCart().add(refItem);
+//                    Object[] newEntry = new Object[4];
+//                    newEntry[0] = refItem.getName(); newEntry[1] = refItem.getID();
+//                    newEntry[2] = refItem.getPrice();
+//
+//                    for(Department d : store.getDepartments())
+//                        for(Item i : d.getItems())
+//                            if(i.equals(refItem))
+//                                newEntry[3] = d.getID();
+//
+//                    ((DefaultTableModel)shoppingCartTable.getModel()).addRow(newEntry);
+//                    shoppingCartTable.revalidate();
+//                    shoppingCartScrollPane.revalidate();
+//
+//                    valueShoppingCartLabel.setText("           " + findShoppingCartTotal().toString());
+//
+//                }
+
+                if(refItem != null){
+                    DefaultTableModel tableModel = new DefaultTableModel();
+
                     referenceCustomer.getShoppingCart().add(refItem);
-                    Object[] newEntry = new Object[4];
-                    newEntry[0] = refItem.getName(); newEntry[1] = refItem.getID();
-                    newEntry[2] = refItem.getPrice();
 
-                    for(Department d : store.getDepartments())
-                        for(Item i : d.getItems())
-                            if(i.equals(refItem))
-                                newEntry[3] = d.getID();
+                    ListIterator<Item> it  = referenceCustomer.getShoppingCart().listIterator();
 
-                    ((DefaultTableModel)shoppingCartTable.getModel()).addRow(newEntry);
+
+                    for(String s : prodColNames)
+                        tableModel.addColumn(s);
+
+
+                    while(it.hasNext()){
+                        Vector<Object> newRow = new Vector<>();
+                        Item currentItem = it.next();
+
+                        newRow.add(currentItem.getName());
+                        newRow.add(currentItem.getID());
+                        newRow.add(currentItem.getPrice());
+
+                        for(Department d : store.getDepartments())
+                            for(Item i : d.getItems())
+                                if(i.equals(currentItem))
+                                    newRow.add(d.getID());
+
+                        tableModel.addRow(newRow);
+                    }
+
+                    shoppingCartTable.setModel(tableModel);
                     shoppingCartTable.revalidate();
                     shoppingCartScrollPane.revalidate();
 
                     valueShoppingCartLabel.setText("           " + findShoppingCartTotal().toString());
-
                 }
             }
         });
@@ -628,11 +663,11 @@ public class MainGUI implements ActionListener {
                     for (Item i : d.getItems())
                         if (i.getID().equals(Integer.parseInt(modifyIDProdText.getText())))
                             referenceItem = i;
-//
-//            if(referenceItem == null){
-//                JOptionPane.showMessageDialog(mainPopUpPanel, "Product does not exist" );
-//                return null;
-//            }
+
+            if(referenceItem == null){
+                JOptionPane.showMessageDialog(mainPopUpPanel, "Product does not exist" );
+                return null;
+            }
 
             return referenceItem;
         }

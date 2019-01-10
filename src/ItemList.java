@@ -1,11 +1,13 @@
 import java.util.*;
 
+import static java.util.Collections.sort;
+
 public abstract class ItemList{
     private Node<Item> beginning;
     private Node<Item> end;
-    private Comparator comparator;
+    private Comparator<Item> comparator;
 
-    ItemList(Comparator comparator) {
+    ItemList(Comparator<Item> comparator) {
         this.comparator = comparator;
         this.beginning = null;
         this.end = null;
@@ -216,6 +218,22 @@ public abstract class ItemList{
         return true;
     }
 
+    public boolean addPlain(Item element){
+        Node <Item> newNode = new Node<Item>(element, null, end);
+
+        if(beginning == null){
+            beginning = newNode;
+            end = newNode;
+
+            return true;
+        }
+
+        end.setNext(newNode);
+        end = newNode;
+
+        return true;
+    }
+
     public boolean removeAll(Collection<? extends Item> c){
         return true;
     }
@@ -344,7 +362,7 @@ public abstract class ItemList{
     public String toString(){
         Vector<Item> items = this.toVector();
 
-        Collections.sort(items, new Comparator<Item>() {
+        sort(items, new Comparator<Item>() {
             public int compare(Item o1, Item o2) {
                 if (o1.getPrice().equals(o2.getPrice()))
                     return 0;
@@ -369,13 +387,21 @@ public abstract class ItemList{
     public void sortList(){
         Vector<Item> v = this.toVector();
 
-        Collections.sort(v, this.comparator);
+        v.sort(new Comparator<Item>() {
+            @Override
+            public int compare(Item o1, Item o2) {
+                if(o1.getPrice() == o2.getPrice())
+                    return 0;
+
+                return o1.getPrice() < o2.getPrice() ? -1 : 1;
+            }
+        });
 
         for(int i = 0; i < v.size(); ++i)
             remove(0);
 
         for(Item i : v)
-            add(i);
+            addPlain(i);
     }
 
     public Double getTotalPrice(){

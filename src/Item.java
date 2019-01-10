@@ -15,6 +15,12 @@ public class Item {
         this.price = price;
     }
 
+    public Item(Item i) {
+        this.name = i.name;
+        this.ID = i.ID;
+        this.price = i.price;
+    }
+
     public void setName(String name) {
         this.name = name;
     }

@@ -113,8 +113,10 @@ public class Test {
                                         if(item.getID().equals(itemID)){
                                             if(list.equals("ShoppingCart"))
                                                 c.getShoppingCart().add(item);
-                                            else if(list.equals("WishList"))
+                                            else if(list.equals("WishList")) {
                                                 c.getWishlist().add(item);
+                                                d.addObserver(c);
+                                            }
                                         }
                         break;
 

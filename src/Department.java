@@ -1,3 +1,4 @@
+import java.util.ListIterator;
 import java.util.Vector;
 
 public abstract class Department implements Subject{
@@ -44,15 +45,29 @@ public abstract class Department implements Subject{
     }
 
     public void modifyItem(Integer itemID, Double newPrice){
+        Store store = Store.getInstance("dummy_text");
+
         for(Item i : items)
             if(i.getID().equals(itemID)) {
                 i.setPrice(newPrice);
                 break;
             }
+
+//        for(Customer c : store.getCustomers()){
+//            ListIterator<Item> it = c.getShoppingCart().listIterator();
+//
+//            while(it.hasNext()){
+//                Item currentItem = it.next();
+//
+//                if(currentItem.getID() == itemID)
+//
+//            }
+//        }
     }
 
     public void addObserver(Customer newObserver){
-        observers.add(newObserver);
+        if(!observers.contains(newObserver))
+            observers.add(newObserver);
     }
 
     public void removeObserver(Customer observer){
@@ -63,8 +78,6 @@ public abstract class Department implements Subject{
         for(Customer observer : observers)
             observer.update(notification);
     }
-
-    public abstract void accept(ShoppingCart shoppingCart);
 
     public abstract void accept(Visitor visitor);
 }
