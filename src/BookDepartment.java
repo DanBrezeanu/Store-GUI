@@ -7,12 +7,7 @@ public class BookDepartment extends Department{
     }
 
     @Override
-    public void accept(ShoppingCart shoppingCart) {
-        shoppingCart.visit(this);
-    }
-
-    @Override
     public void accept(Visitor visitor) {
-        //TODO: THIS
+        visitor.visit(this);
     }
 }
