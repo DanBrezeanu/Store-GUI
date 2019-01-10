@@ -787,9 +787,9 @@ public class MainGUI implements ActionListener {
         newProdPrice = new JLabel("  Price:  ");
         newProdDepartment = new JLabel("  Department:  ");
 
-        nameTextField = new JTextField(referenceItem.getName(), 20);
-        IDTextField = new JTextField(referenceItem.getID().toString(), 20);
-        priceTextField = new JTextField(referenceItem.getPrice().toString(), 20);
+        nameTextField = new JTextField(referenceItem !=  null ? referenceItem.getName() : "", 20);
+        IDTextField = new JTextField(referenceItem != null ? referenceItem.getID().toString() : "", 20);
+        priceTextField = new JTextField(referenceItem != null ? referenceItem.getPrice().toString() : "", 20);
 
         mainPopUpPanel = new JPanel(new GridLayout(0,1));
 
@@ -864,7 +864,7 @@ public class MainGUI implements ActionListener {
                     }
 
 
-                    //TODO: V   REVALIDATE TOTAL LABELS
+
                     if(customerHadTheItem){
                         if(referenceCustomer == c){
                             ListIterator<Item> it = referenceCustomer.getShoppingCart().listIterator();
@@ -896,7 +896,7 @@ public class MainGUI implements ActionListener {
 
 
                             shoppingCartTable.setModel(tableModel);
-
+                            valueShoppingCartLabel.setText("            " + findShoppingCartTotal());
                             shoppingCartScrollPane.revalidate();
                             shoppingCartTable.setFillsViewportHeight(true);
                             shoppingCartPanel.revalidate();

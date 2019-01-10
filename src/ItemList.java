@@ -1,9 +1,6 @@
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.ListIterator;
-import java.util.Vector;
+import java.util.*;
 
-public abstract class ItemList {
+public abstract class ItemList{
     private Node<Item> beginning;
     private Node<Item> end;
     private Comparator comparator;
@@ -214,9 +211,14 @@ public abstract class ItemList {
         end.setNext(newNode);
         end = newNode;
 
+        this.sortList();
+
         return true;
     }
 
+    public boolean removeAll(Collection<? extends Item> c){
+        return true;
+    }
     public Item getItem(int index) {
         ItemIterator<Item> it = new ItemIterator<Item>(index, beginning);
 
@@ -327,11 +329,11 @@ public abstract class ItemList {
         return v;
     }
 
-    public int size(){
+    public int size() {
         ListIterator<Item> it = this.listIterator();
         int size = 0;
 
-        while(it.hasNext()){
+        while (it.hasNext()) {
             it.next();
             size++;
         }
