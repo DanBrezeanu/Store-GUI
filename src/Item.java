@@ -45,6 +45,10 @@ public class Item {
         return price;
     }
 
+    public boolean equals(Item obj) {
+        return (obj.getID().equals(ID));
+    }
+
     public String toString(){
         return this.name + ";" + this.ID + ";" + this.price;
     }

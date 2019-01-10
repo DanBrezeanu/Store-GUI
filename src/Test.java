@@ -99,6 +99,7 @@ public class Test {
 
                 Integer itemID; Double itemPrice; String itemName;
                 Integer depID; String customerName; String list;
+                FileWriter fw = null;
 
                 switch(event){
                     case "addItem":
@@ -175,8 +176,6 @@ public class Test {
                         for(Customer c : store.getCustomers()){
                             if(c.getName().equals(customerName)){
                                 if(list.equals("ShoppingCart")){
-                                    FileWriter fw = null;
-
                                     try{
                                         fw = new FileWriter("results.txt", true);
 
@@ -195,7 +194,6 @@ public class Test {
                                     }
                                 }
                                 else if(list.equals("WishList")){
-                                    FileWriter fw = null;
 
                                     try{
                                         fw = new FileWriter("results.txt", true);
@@ -234,7 +232,7 @@ public class Test {
                                 break;
                             }
                         }
-                        FileWriter fw = null;
+
 
                         try{
                             fw = new FileWriter("results.txt", true);
@@ -258,9 +256,56 @@ public class Test {
                         break;
 
                     case "getObservers":
+                        depID = Integer.parseInt(tokenizer.nextToken());
+                        Vector<String> observers = new Vector<>();
+
+                        for(Customer c : store.getDepartment(depID).getObservers())
+                            observers.add(c.getName());
+
+                        try{
+                            fw = new FileWriter("results.txt", true);
+
+                            fw.write(observers + "\n");
+
+                        }catch(IOException e){
+                            e.printStackTrace();
+                        }finally{
+                            if(fw != null) {
+                                try {
+                                    fw.close();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+
                         break;
 
                     case "getNotifications":
+                        customerName =tokenizer.nextToken();
+                        Vector<String> notifications = new Vector<>();
+
+
+                        for(Notification n : store.getCustomer(customerName).getNotifications())
+                            notifications.add(n.toString());
+
+                        try{
+                            fw = new FileWriter("results.txt", true);
+
+                            fw.write(notifications + "\n");
+
+                        }catch(IOException e){
+                            e.printStackTrace();
+                        }finally{
+                            if(fw != null) {
+                                try {
+                                    fw.close();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+
                         break;
 
                 }
@@ -279,5 +324,7 @@ public class Test {
         test.parseStoreTxt(new File("store.txt"));
         test.parseCustomersTxt(new File("customers.txt"));
         test.parseEventsTxt();
+
+
     }
 }

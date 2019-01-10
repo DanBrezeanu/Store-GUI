@@ -201,7 +201,7 @@ public abstract class ItemList{
     }
 
     public boolean add(Item element) {
-        Node<Item> newNode = new Node<Item>(element, null, end);
+        Node<Item> newNode = new Node<Item>(new Item(element), null, end);
 
         if(beginning == null){
             beginning = newNode;
@@ -219,7 +219,7 @@ public abstract class ItemList{
     }
 
     public boolean addPlain(Item element){
-        Node <Item> newNode = new Node<Item>(element, null, end);
+        Node <Item> newNode = new Node<Item>(new Item(element), null, end);
 
         if(beginning == null){
             beginning = newNode;
@@ -237,10 +237,15 @@ public abstract class ItemList{
     public boolean removeAll(Collection<? extends Item> c){
         return true;
     }
+
     public Item getItem(int index) {
         ItemIterator<Item> it = new ItemIterator<Item>(index, beginning);
 
         return it.next();
+    }
+
+    public Item getItem(Item element){
+        return getItem(this.indexOf(element));
     }
 
     public Node<Item> getNode(int index) {
