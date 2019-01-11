@@ -258,6 +258,7 @@ public class Test {
 
 
                         try{
+
                             fw = new FileWriter("output.txt", true);
 
                             fw.write(result + "\n");
