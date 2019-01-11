@@ -1,5 +1,4 @@
 import java.util.ListIterator;
-import java.util.Observer;
 
 public class ShoppingCart extends ItemList implements Visitor {
     private Double budget;
