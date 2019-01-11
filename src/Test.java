@@ -88,7 +88,7 @@ public class Test {
     public void parseEventsTxt(){
         try{
             Scanner eventsSc = new Scanner(new File("events.txt"));
-            new FileWriter("results.txt");
+            new FileWriter("output.txt");
 
             Integer numberOfEvents = Integer.parseInt(eventsSc.nextLine());
             StringTokenizer tokenizer;
@@ -200,7 +200,7 @@ public class Test {
                             if(c.getName().equals(customerName)){
                                 if(list.equals("ShoppingCart")){
                                     try{
-                                        fw = new FileWriter("results.txt", true);
+                                        fw = new FileWriter("output.txt", true);
 
                                         fw.write(c.getShoppingCart().toString() + "\n");
 
@@ -219,7 +219,7 @@ public class Test {
                                 else if(list.equals("WishList")){
 
                                     try{
-                                        fw = new FileWriter("results.txt", true);
+                                        fw = new FileWriter("output.txt", true);
 
                                         fw.write(c.getWishlist().toString() + "\n");
 
@@ -258,7 +258,7 @@ public class Test {
 
 
                         try{
-                            fw = new FileWriter("results.txt", true);
+                            fw = new FileWriter("output.txt", true);
 
                             fw.write(result + "\n");
 
@@ -290,7 +290,7 @@ public class Test {
                             observers.add(c.getName());
 
                         try{
-                            fw = new FileWriter("results.txt", true);
+                            fw = new FileWriter("output.txt", true);
 
                             fw.write(observers + "\n");
 
@@ -317,7 +317,7 @@ public class Test {
                             notifications.add(n.toString());
 
                         try{
-                            fw = new FileWriter("results.txt", true);
+                            fw = new FileWriter("output.txt", true);
 
                             fw.write(notifications + "\n");
 
