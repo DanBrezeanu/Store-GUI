@@ -326,7 +326,7 @@ public abstract class ItemList{
         if(index == -1)
             return null;
 
-        return remove(index);
+        return this.remove(index);
     }
 
     public Item removeNoNotification(int index){

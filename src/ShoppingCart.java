@@ -19,6 +19,16 @@ public class ShoppingCart extends ItemList implements Visitor {
         return budget;
     }
 
+    @Override
+    public boolean add(Item item){
+        if(item.getPrice() <= budget) {
+            budget -= item.getPrice();
+            super.add(item);
+            return true;
+        }
+
+       return false;
+    }
 
 
     @Override

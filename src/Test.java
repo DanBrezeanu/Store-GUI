@@ -77,7 +77,7 @@ public class Test {
             for(int i = 0; i < numberOfCustomers; ++i){
                 StringTokenizer tokenizer = new StringTokenizer(customerSc.nextLine(), ";");
 
-                store.addCustomer(new Customer(tokenizer.nextToken(), Double.parseDouble(tokenizer.nextToken()),
+                store.enter(new Customer(tokenizer.nextToken(), Double.parseDouble(tokenizer.nextToken()),
                         tokenizer.nextToken()));
             }
         } catch(IOException e){
@@ -250,7 +250,7 @@ public class Test {
                                 if(list.equals("ShoppingCart"))
                                     result = c.getShoppingCart().getTotalPrice();
                                 else if(list.equals("WishList"))
-                                    result = c.getShoppingCart().getTotalPrice();
+                                    result = c.getWishlist().getTotalPrice();
 
                                 break;
                             }
@@ -315,6 +315,7 @@ public class Test {
 
 
                         for(Notification n : store.getCustomer(customerName).getNotifications())
+                            if(!notifications.contains(n.toString()))
                             notifications.add(n.toString());
 
                         try{

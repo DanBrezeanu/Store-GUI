@@ -100,17 +100,12 @@ public class Wishlist extends ItemList {
 
         if(!foundItemFromDep)
             for(Customer c : store.getCustomers())
-                if(c.getWishlist() == this)
+                if(c.getWishlist() == this) {
                     departmentFound.removeObserver(c);
+                    break;
+                }
 
         return super.remove(item);
-    }
-
-    @Override
-    public Item remove(int index){
-        Item item = this.getItem(index);
-
-        return this.remove(item);
     }
 
 

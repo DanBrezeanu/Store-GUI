@@ -42,6 +42,10 @@ public class Customer implements Observer{
 
     @Override
     public void update(Notification notification) {
+        for(Notification n : this.notifications)
+            if(n.equals(notification))
+                return;
+
         notifications.add(notification);
     }
 }

@@ -21,6 +21,27 @@ public class Notification {
         currentDate = new Date();
     }
 
+    public NotificationType getType() {
+        return type;
+    }
+
+    public Integer getDepartmentID() {
+        return departmentID;
+    }
+
+    public Integer getProductID() {
+        return productID;
+    }
+
+
+    public boolean equals(Notification n) {
+        if(n.getDepartmentID().equals(this.departmentID) && n.getProductID().equals(this.productID) &&
+        n.getType().equals(this.type))
+            return true;
+
+        return false;
+    }
+
     @Override
     public String toString() {
         return type.toString() + ";" + productID + ";" + departmentID;

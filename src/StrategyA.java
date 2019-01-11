@@ -28,7 +28,7 @@ public class StrategyA implements Strategy {
         FileWriter fw = null;
 
         try{
-          fw = new FileWriter("results.txt", true);
+          fw = new FileWriter("output.txt", true);
 
           fw.write(minItem.toString() + "\n");
         }catch(IOException e){

@@ -6,6 +6,7 @@ import java.util.ListIterator;
 public class StrategyC implements Strategy {
     @Override
     public void execute(Wishlist wishlist) {
+        Store store = Store.getInstance("dummy_text");
         ListIterator<Item> it = wishlist.listIterator();
         Item current = null;
 
@@ -15,8 +16,15 @@ public class StrategyC implements Strategy {
 
         FileWriter fw = null;
 
+
+        wishlist.removeNoNotification(current);
+
+        for(Customer c : store.getCustomers())
+            if(c.getWishlist() == wishlist)
+                c.getShoppingCart().addPlain(current);
+
         try{
-            fw = new FileWriter("results.txt", true);
+            fw = new FileWriter("output.txt", true);
 
             fw.write(current.toString() + "\n");
         }catch(IOException e){
