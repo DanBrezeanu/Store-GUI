@@ -329,6 +329,46 @@ public abstract class ItemList{
         return remove(index);
     }
 
+    public Item removeNoNotification(int index){
+        ItemIterator<Item> it = new ItemIterator<Item>(index, beginning);
+
+        Node<Item> node = it.getNode();
+
+        if(node.getPrev() == null){
+
+            if(node.getNext() == null){   // only 1 element
+                beginning = null;
+                end = null;
+            }
+            else{
+                node.getNext().setPrev(null); // first element
+                beginning = node.getNext();
+            }
+        }
+        else{
+
+            if(node.getNext() == null){ // last element
+                node.getPrev().setNext(null);
+                end = node.getPrev();
+            }
+            else{   //some element
+                node.getPrev().setNext(node.getNext());
+                node.getNext().setPrev(node.getPrev());
+            }
+        }
+
+        return node.getValue();
+    }
+
+    public Item removeNoNotification(Item item){
+        int index = indexOf(item);
+
+        if(index == -1)
+            return null;
+
+        return removeNoNotification(index);
+    }
+
     public boolean isEmpty(){
         return (beginning == null);
     }
@@ -403,7 +443,7 @@ public abstract class ItemList{
         });
 
         for(int i = 0; i < v.size(); ++i)
-            remove(0);
+            this.removeNoNotification(0);
 
         for(Item i : v)
             addPlain(i);

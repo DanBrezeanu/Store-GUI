@@ -44,10 +44,39 @@ public class Wishlist extends ItemList {
                             break;
                         }
 
-        super.add(item);
+        super.addPlain(item);
 
         return true;
     }
+
+    @Override
+    public Item removeNoNotification(Item item){
+        Store store = Store.getInstance("dummy_text");
+
+        boolean foundItemFromDep = false;
+        Department departmentFound = null;
+
+        outer_code:
+        for(Department d : store.getDepartments())
+            for(Item i : d.getItems())
+                if(i.equals(item)) {
+                    for (Item j : d.getItems())
+                        if (this.contains(j) && !j.equals(item)) {
+                            foundItemFromDep = true;
+                            break;
+                        }
+                    departmentFound = d;
+                    break outer_code;
+                }
+
+        if(!foundItemFromDep)
+            for(Customer c : store.getCustomers())
+                if(c.getWishlist() == this)
+                    departmentFound.removeObserver(c);
+
+        return super.removeNoNotification(item);
+    }
+
 
     @Override
     public Item remove(Item item){
@@ -56,14 +85,18 @@ public class Wishlist extends ItemList {
         boolean foundItemFromDep = false;
         Department departmentFound = null;
 
+        outer_code:
         for(Department d : store.getDepartments())
             for(Item i : d.getItems())
-                if(i.equals(item))
-                   for(Item j : d.getItems())
-                       if(this.contains(j) && !j.equals(item)) {
-                           foundItemFromDep = true;
-                           departmentFound = d;
-                       }
+                if(i.equals(item)) {
+                    for (Item j : d.getItems())
+                        if (this.contains(j) && !j.equals(item)) {
+                            foundItemFromDep = true;
+                            break;
+                        }
+                    departmentFound = d;
+                    break outer_code;
+                }
 
         if(!foundItemFromDep)
             for(Customer c : store.getCustomers())

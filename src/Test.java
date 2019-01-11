@@ -88,6 +88,7 @@ public class Test {
     public void parseEventsTxt(){
         try{
             Scanner eventsSc = new Scanner(new File("events.txt"));
+            new FileWriter("results.txt");
 
             Integer numberOfEvents = Integer.parseInt(eventsSc.nextLine());
             StringTokenizer tokenizer;
@@ -122,7 +123,24 @@ public class Test {
                         break;
 
                     case "delItem":
-                        //TODO:
+                        itemID = Integer.parseInt(tokenizer.nextToken());
+                        list = tokenizer.nextToken();
+                        customerName = tokenizer.nextToken();
+                        Item refItem = null;
+
+                        for(Department d : store.getDepartments())
+                            for(Item itm : d.getItems())
+                                if(itm.getID().equals(itemID))
+                                    refItem = itm;
+
+                        if(list.equals("ShoppingCart")) {
+                            if(store.getCustomer(customerName).getShoppingCart().contains(refItem));
+                                store.getCustomer(customerName).getShoppingCart().remove(refItem);
+                        }
+                        else if(list.equals("WishList")){
+                            if(store.getCustomer(customerName).getWishlist().contains(refItem));
+                                store.getCustomer(customerName).getWishlist().remove(refItem);
+                        }
                         break;
 
                     case "addProduct":
@@ -155,7 +173,12 @@ public class Test {
                         break;
 
                     case "delProduct":
-                        //TODO:
+                        itemID = Integer.parseInt(tokenizer.nextToken());
+
+                        for(Department d : store.getDepartments())
+                            for(Item itm : d.getItems())
+                                if(itm.getID().equals(itemID))
+                                    d.removeItem(itemID);
                         break;
 
                     case "getItem":
@@ -253,6 +276,10 @@ public class Test {
                         break;
 
                     case "accept":
+                        depID = Integer.parseInt(tokenizer.nextToken());
+                        customerName = tokenizer.nextToken();
+
+                        store.getDepartment(depID).accept(store.getCustomer(customerName).getShoppingCart());
                         break;
 
                     case "getObservers":
