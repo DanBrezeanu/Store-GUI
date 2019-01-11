@@ -1,6 +1,7 @@
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.*;
 
 public class Test {
@@ -260,7 +261,6 @@ public class Test {
                         try{
 
                             fw = new FileWriter("output.txt", true);
-
                             fw.write(result + "\n");
 
                         }catch(IOException e){

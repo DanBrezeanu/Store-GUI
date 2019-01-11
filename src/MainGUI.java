@@ -73,8 +73,8 @@ public class MainGUI implements ActionListener {
         customersTxt = new JLabel("   customers.txt  ");
         browseStoreTxt = new JButton("Browse..");
         browseCustomersTxt = new JButton("Browse..");
-        pathStoreTxt = new JTextField("C:\\Users\\nxf51086\\IdeaProjects\\Tema11\\store.txt"); //TODO: new TextField(50)
-        pathCustomersTxt = new JTextField("C:\\Users\\nxf51086\\IdeaProjects\\Tema11\\customers.txt"); //TODO: new TextField(50)
+        pathStoreTxt = new JTextField(50);
+        pathCustomersTxt = new JTextField(50);
 
         importPanel.add(browseStoreTxt, c);
         c.gridx++;
@@ -387,6 +387,22 @@ public class MainGUI implements ActionListener {
 
                 shoppingCartTable.revalidate();
                 shoppingCartScrollPane.revalidate();
+            }
+        });
+
+        finaliseOrderShoppingCartButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ShoppingCart refShoppingCart = referenceCustomer.getShoppingCart();
+                Double newBudget = refShoppingCart.getBudget() - refShoppingCart.getTotalPrice();
+
+                while(!refShoppingCart.isEmpty())
+                    refShoppingCart.remove(refShoppingCart.getItem(0));
+
+                shoppingCartPanel.removeAll();
+                createShoppingCartPanel();
+                shoppingCartPanel.revalidate();
+
             }
         });
 
@@ -770,12 +786,11 @@ public class MainGUI implements ActionListener {
 
     }
 
-    public void createPopUpModifyProduct(){
-        //TODO: MODIFY FOR CUSTOMERS
+    public void createPopUpModifyProduct() {
 
         Store store = Store.getInstance("dummy_text");
 
-        JPanel mainPopUpPanel = new JPanel(new GridLayout(0,1));
+        JPanel mainPopUpPanel = new JPanel(new GridLayout(0, 1));
         JLabel modifyIDProd = new JLabel("ID:");
         JTextField modifyIDProdText = new JTextField(50);
         Item referenceItem = null;
@@ -788,19 +803,18 @@ public class MainGUI implements ActionListener {
         int result = JOptionPane.showConfirmDialog(null, mainPopUpPanel, "Select ID to modify",
                 JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 
-        if(result == JOptionPane.OK_OPTION){
-            if(modifyIDProdText.getText().length() != 0)
+        if (result == JOptionPane.OK_OPTION) {
+            if (modifyIDProdText.getText().length() != 0)
                 for (Department d : store.getDepartments())
                     for (Item i : d.getItems())
                         if (i.getID().equals(Integer.parseInt(modifyIDProdText.getText())))
                             referenceItem = i;
 
-            if(referenceItem == null){
-                JOptionPane.showMessageDialog(mainPopUpPanel, "Product does not exist" );
+            if (referenceItem == null) {
+                JOptionPane.showMessageDialog(mainPopUpPanel, "Product does not exist");
                 return;
             }
-        }
-        else if(result == JOptionPane.CANCEL_OPTION)
+        } else if (result == JOptionPane.CANCEL_OPTION)
             return;
 
         JLabel newProdName, newProdID, newProdPrice, newProdDepartment;
@@ -809,7 +823,7 @@ public class MainGUI implements ActionListener {
         String[] comboData = new String[4];
         int currentDepart = 0;
 
-        for(Department d : store.getDepartments()){
+        for (Department d : store.getDepartments()) {
             comboData[currentDepart] = d.getName();
             currentDepart++;
         }
@@ -822,11 +836,11 @@ public class MainGUI implements ActionListener {
         newProdPrice = new JLabel("  Price:  ");
         newProdDepartment = new JLabel("  Department:  ");
 
-        nameTextField = new JTextField(referenceItem !=  null ? referenceItem.getName() : "", 20);
+        nameTextField = new JTextField(referenceItem != null ? referenceItem.getName() : "", 20);
         IDTextField = new JTextField(referenceItem != null ? referenceItem.getID().toString() : "", 20);
         priceTextField = new JTextField(referenceItem != null ? referenceItem.getPrice().toString() : "", 20);
 
-        mainPopUpPanel = new JPanel(new GridLayout(0,1));
+        mainPopUpPanel = new JPanel(new GridLayout(0, 1));
 
         mainPopUpPanel.add(newProdName);
         mainPopUpPanel.add(nameTextField);
@@ -838,17 +852,64 @@ public class MainGUI implements ActionListener {
         mainPopUpPanel.add(departmentCombo);
 
 
-         result = JOptionPane.showConfirmDialog(null, mainPopUpPanel, "Modify Product",
+        result = JOptionPane.showConfirmDialog(null, mainPopUpPanel, "Modify Product",
                 JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 
-        if(result == JOptionPane.OK_OPTION){
+        if (result == JOptionPane.OK_OPTION) {
+
+            for (Customer c : store.getCustomers()) {
+                if (c.getShoppingCart().contains(referenceItem)) {
+                    c.getShoppingCart().getItem(referenceItem).setPrice(Double.parseDouble(priceTextField.getText()));
+                    c.getShoppingCart().getItem(referenceItem).setID(Integer.parseInt(IDTextField.getText()));
+                    c.getShoppingCart().getItem(referenceItem).setName(nameTextField.getText());
+                }
+                if (c.getWishlist().contains(referenceItem)) {
+                    c.getWishlist().getItem(referenceItem).setPrice(Double.parseDouble(priceTextField.getText()));
+                    c.getWishlist().getItem(referenceItem).setID(Integer.parseInt(IDTextField.getText()));
+                    c.getWishlist().getItem(referenceItem).setName(nameTextField.getText());
+                }
+            }
+
+            shoppingCartPanel.removeAll();
+            createShoppingCartPanel();
+            shoppingCartPanel.revalidate();
+
+            DefaultTableModel tblModel = new DefaultTableModel();
+            ListIterator<Item> it = referenceCustomer.getWishlist().listIterator();
+            Item currentItm;
+
+            for(String s : prodColNames)
+             tblModel.addColumn(s);
+
+            while(it.hasNext()){
+                currentItm = it.next();
+                Vector<Object> newRow = new Vector<>();
+
+                newRow.add(currentItm.getName());
+                newRow.add(currentItm.getID());
+                newRow.add(currentItm.getPrice());
+
+                for(Department d : store.getDepartments())
+                    for(Item i : d.getItems())
+                        if(i.equals(currentItm)){
+                            newRow.add(d.getID());
+                        }
+
+                tblModel.addRow(newRow);
+            }
+
+            wishListTable.setModel(tblModel);
+            wishListScrollPane.revalidate();
+            wishListPanel.revalidate();
+
             referenceItem.setName(nameTextField.getText());
             referenceItem.setID(Integer.parseInt(IDTextField.getText()));
             referenceItem.setPrice(Double.parseDouble(priceTextField.getText()));
 
             storePanel.removeAll();
             createStorePanel();
-        }
+      }
+
     }
 
     public void createPopUpDeleteProduct(){
